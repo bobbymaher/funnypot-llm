@@ -2,3 +2,9 @@
 *.gguf
 models/
 .env
+
+# training experiment outputs
+train/adapter/
+train/fused/
+.venv/
+mlx-venv/
