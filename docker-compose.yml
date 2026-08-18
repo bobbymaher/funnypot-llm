@@ -1,0 +1,27 @@
+# Standalone stack for building and smoke-testing the sidecar on its own:
+#   docker compose up --build
+#   curl -s localhost:8080/health
+#   curl -s localhost:8080/completion -d '{"prompt":"<|im_start|>user\nhi<|im_end|>\n<|im_start|>assistant\n","n_predict":16}'
+#
+# In the funnypot stack this service is internal-only (no published port) and funnypot reaches it at
+# http://funnypot-llm:8080/completion. See README for wiring it into demo/docker-compose.yml.
+services:
+  funnypot-llm:
+    build:
+      context: .
+      args:
+        MODEL_SHA256: "${MODEL_SHA256:-}"
+    image: funnypot-llm:latest
+    ports:
+      - "8080:8080" # standalone testing only; drop this in the funnypot stack
+    environment:
+      CTX_SIZE: "2048"
+      PARALLEL: "2"
+      THREADS: "2"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/health || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 12
+      start_period: 60s
+    restart: unless-stopped

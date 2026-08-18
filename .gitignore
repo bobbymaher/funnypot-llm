@@ -1,0 +1,4 @@
+# Baked at build time, never committed.
+*.gguf
+models/
+.env
