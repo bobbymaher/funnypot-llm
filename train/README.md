@@ -27,6 +27,14 @@ self-distillation. No nuclei matcher strings are involved.
 Regenerate/extend it: `php generate-corpus.php <N>` (needs a running funnypot-llm sidecar at
 `127.0.0.1:18080`), then re-split into `data/`.
 
+**Corpus validation** (220 pairs): 100% valid HTML (`<!doctype`/`<html`, `<` first byte), 142–501
+chars (median 271 — real pages, not stubs), 220 distinct `<title>`s, and **zero** fingerprint-poison
+substrings (`nuclei`, `CVE-`, `matcher`, `interactsh`, `{{BaseURL}}`, …). Clean and safe to train on.
+
+> **Status:** the fine-tune below was prepped but not yet run — `pip install mlx-lm` was blocked by
+> flaky pypi connectivity on the build machine. Everything else is ready; run the two commands when
+> the network cooperates.
+
 ## Run it (Apple Silicon)
 
 ```bash
