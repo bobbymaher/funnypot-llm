@@ -12,8 +12,9 @@ FROM ${LLAMA_IMAGE}
 # Qwen2.5-Coder-0.5B-Instruct, Q4_K_M (~400 MB). Small, code-biased, and in testing it emits bare
 # HTML without the refusals/"here is the code:" preambles the general 0.5B models tend to add.
 ARG MODEL_URL=https://huggingface.co/Qwen/Qwen2.5-Coder-0.5B-Instruct-GGUF/resolve/main/qwen2.5-coder-0.5b-instruct-q4_k_m.gguf
-# Leave empty to skip verification (the build prints the real hash); set it to pin the model.
-ARG MODEL_SHA256=
+# sha256 of the default model above. Override (with MODEL_URL) to bake a different model; set empty
+# to skip verification — the build prints the computed hash either way.
+ARG MODEL_SHA256=1d9614638d18024d0fbb36575a15f1302a3adf044df10345688ec4f6e1c4ff32
 
 ENV MODEL_PATH=/models/model.gguf \
     PORT=8080 \

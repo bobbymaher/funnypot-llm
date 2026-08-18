@@ -5,12 +5,17 @@
 set -e
 
 BIN=""
-for c in llama-server /llama-server /app/llama-server; do
-    if command -v "$c" >/dev/null 2>&1 || [ -x "$c" ]; then
+# Absolute paths first: a bare name is only accepted once command -v resolves it to a real path,
+# so we never hand exec a cwd-relative name that PATH lookup then fails to find.
+for c in /app/llama-server /llama-server /usr/local/bin/llama-server; do
+    if [ -x "$c" ]; then
         BIN="$c"
         break
     fi
 done
+if [ -z "$BIN" ]; then
+    BIN="$(command -v llama-server 2>/dev/null || true)"
+fi
 if [ -z "$BIN" ]; then
     echo "funnypot-llm: llama-server binary not found in image" >&2
     exit 1
