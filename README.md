@@ -123,6 +123,25 @@ is only ever generated once anyway.
 
 ## Sizing
 
-The 0.5B Q4 model runs on a small always-on instance (~1–2 vCPU, ~1 GB free RAM). Generations are a
-few hundred ms to low seconds on CPU; funnypot caches every result by normalised path, so a given
-unknown URL is generated once and served from SQLite forever after.
+Generation speed is very sensitive to the box. The model itself needs ~500–700 MB resident, and each
+generation is a few hundred output tokens — so CPU throughput dominates.
+
+Measured (Q4_K_M, ~160-token page):
+
+| Box                              | per generation | notes                                             |
+| -------------------------------- | -------------- | ------------------------------------------------- |
+| Apple M1 (dev)                   | ~3–8 s         | comfortable                                       |
+| t3.small / t3.medium and up      | ~5–12 s (est.) | workable for synchronous serving                  |
+| **t3.micro (2 vCPU, 917 MB)**    | **~24–29 s**   | **too slow + swaps; do not serve synchronously**  |
+
+The t3.micro number is a real warning: 917 MB RAM forces the model into swap (prompt eval collapses
+to <1 tok/s while thrashing), and 24–29 s blows past a typical `fastcgi_read_timeout`, so requests
+504 instead of returning a fake. Synchronous serving needs a box where a generation comfortably fits
+under the web timeout — plan for **≥2 GB RAM and a non-throttled CPU** (t3.small is the practical floor,
+t3.medium is comfortable). Set `FUNNYPOT_LLM_TIMEOUT_MS` below nginx's `fastcgi_read_timeout` so a slow
+generation degrades to a clean 404 rather than a 504.
+
+For genuinely small boxes, the right fix is **asynchronous generation** (funnypot returns the plain 404
+immediately and generates in the background, serving the fake on a later hit of the same path) — that
+decouples generation latency from the request entirely. Either way funnypot caches every result by
+normalised path, so a given unknown URL is generated once and served from SQLite from then on.
