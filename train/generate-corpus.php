@@ -47,12 +47,11 @@ shuffle($paths);
 $target = (int) ($argv[1] ?? 220);
 $paths = array_slice($paths, 0, $target);
 
-// Minimal training prompt: a fixed one-line system instruction + the bare request. No exemplar,
-// no grammar — that scaffolding is exactly what fine-tuning should let us drop.
-$minimalPrompt = static function (string $method, string $path): string {
-    return "<|im_start|>system\nYou are a web server. Output only the raw HTML the page at the requested path returns.<|im_end|>\n"
-        . "<|im_start|>user\n{$method} {$path}<|im_end|>\n<|im_start|>assistant\n";
-};
+// A fixed one-line system instruction + the bare request as the training input. No exemplar, no
+// grammar — that scaffolding is exactly what fine-tuning should let us drop. Emitted as mlx-lm's
+// native chat format so the tokenizer applies the ChatML template + special tokens itself (baking
+// the markers into a prompt/completion string double-formats them and the model learns nothing).
+$system = 'You are a web server. Output only the raw HTML the page at the requested path returns.';
 
 $ok = 0;
 $fail = 0;
@@ -65,8 +64,11 @@ foreach ($paths as $i => $path) {
         continue;
     }
     $line = json_encode([
-        'prompt' => $minimalPrompt('GET', $path),
-        'completion' => $html . '<|im_end|>',
+        'messages' => [
+            ['role' => 'system', 'content' => $system],
+            ['role' => 'user', 'content' => 'GET ' . $path],
+            ['role' => 'assistant', 'content' => $html],
+        ],
     ], JSON_UNESCAPED_SLASHES);
     fwrite($jsonl, $line . "\n");
     $ok++;

@@ -6,7 +6,7 @@ DIR="$(cd "$(dirname "$0")" && pwd)"
 PY="${PY:-python}"
 MODEL="${MODEL:-Qwen/Qwen2.5-Coder-0.5B-Instruct}"
 
-exec "$PY" -m mlx_lm.lora \
+exec "$PY" -m mlx_lm lora \
     --model "$MODEL" \
     --train \
     --data "$DIR/data" \
