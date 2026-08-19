@@ -1,6 +1,6 @@
 # funnypot-llm
 
-A tiny, CPU-only LLM sidecar for [funnypot](https://github.com/bobbymaher/funnypot). It generates a
+A tiny, CPU-only LLM sidecar for [funnypot](https://github.com/metrictower/funnypot). It generates a
 plausible fake HTML page for requests the honeypot has no template for — the paths that would
 otherwise return a bare 404 — so a scanner walking an unknown app keeps getting believable pages
 instead of a wall of 404s.
