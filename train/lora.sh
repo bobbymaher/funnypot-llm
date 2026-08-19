@@ -5,15 +5,17 @@ set -e
 DIR="$(cd "$(dirname "$0")" && pwd)"
 PY="${PY:-python}"
 MODEL="${MODEL:-Qwen/Qwen2.5-Coder-0.5B-Instruct}"
+DATA="${DATA:-$DIR/data}"
+ADAPTER="${ADAPTER:-$DIR/adapter}"
 
 exec "$PY" -m mlx_lm lora \
     --model "$MODEL" \
     --train \
-    --data "$DIR/data" \
+    --data "$DATA" \
     --iters "${ITERS:-300}" \
     --batch-size "${BATCH:-4}" \
     --num-layers "${LAYERS:-16}" \
     --max-seq-length "${SEQ:-1024}" \
-    --adapter-path "$DIR/adapter" \
-    --steps-per-report 20 \
-    --steps-per-eval 100
+    --adapter-path "$ADAPTER" \
+    --steps-per-report "${STEPS_REPORT:-20}" \
+    --steps-per-eval "${STEPS_EVAL:-100}"

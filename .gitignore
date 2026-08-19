@@ -5,6 +5,7 @@ models/
 
 # training experiment outputs
 train/adapter/
+train/adapter-galah/
 train/fused/
 .venv/
 mlx-venv/

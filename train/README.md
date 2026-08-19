@@ -1,5 +1,13 @@
 # Training experiment — self-distilled LoRA for bare-prompt HTML
 
+> **Round 2 (current):** `data/{train,valid,test}.jsonl` now holds a corpus built from
+> [Galah](https://github.com/0x4D31/galah)'s real-attacker-traffic replay logs, on funnypot's real
+> production prompt contract (not the simplified stand-in below). See `GALAH-RESULTS.md` for that
+> round's build notes, gate details, a regression found + fixed, and its own A/B numbers. The
+> original self-distilled corpus and result described below moved to `data/self-distilled-v1/`
+> (same format, still runnable) rather than being deleted. `build-galah-corpus.py` regenerates the
+> round-2 corpus from a Galah checkout; `generate-corpus.php` (below) still regenerates round 1's.
+
 An experiment: can we fine-tune the 0.5B model so it emits a clean fake page from a **bare** request
 prompt, dropping the GBNF grammar + one-shot exemplar the prompt-only setup needs? Less scaffolding =
 shorter prompts, lower latency, fewer refusals.
@@ -71,7 +79,11 @@ pip install mlx-lm
 python eval.py                  # A/B: base vs base+adapter on the held-out test set
 ```
 
-Tunables via env: `ITERS` (300), `BATCH` (4), `LAYERS` (16), `SEQ` (1024), `MODEL`.
+Tunables via env: `ITERS` (300), `BATCH` (4), `LAYERS` (16), `SEQ` (1024), `MODEL`, `DATA`
+(`train/data`), `ADAPTER` (`train/adapter`), `STEPS_REPORT` (20), `STEPS_EVAL` (100). Watch val loss
+and stop near its minimum — both rounds so far show it bottoming out well before `ITERS` and drifting
+back up (mild overfit) if training continues past that point; on a small corpus, check more often
+with a lower `STEPS_EVAL` than the default.
 
 ## What "better" means
 
