@@ -9,3 +9,8 @@ train/adapter-galah/
 train/fused/
 .venv/
 mlx-venv/
+
+# vulhub-recorder captures -- recorded JSONL corpora, not source; some targets are internal-only
+# and must never be committed (see tools/vulhub-recorder/README.md)
+tools/vulhub-recorder/out/
+__pycache__/

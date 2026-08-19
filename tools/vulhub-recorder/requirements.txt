@@ -1,0 +1,4 @@
+# mitmdump is the only Python dependency this tool needs. driver.py and record_addon.py are
+# stdlib-only otherwise -- see README.md for the (optional) external CLI tools (feroxbuster,
+# nuclei) some request-corpus drivers shell out to.
+mitmproxy>=9.0.0
